@@ -1,0 +1,8 @@
+{
+  "sap.app": {
+    "id": "appfront-template",
+    "applicationVersion": {
+      "version": "v1"
+    }
+  }
+}

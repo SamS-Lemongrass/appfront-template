@@ -1,0 +1,9 @@
+{
+  "welcomeFile": "index.html",
+  "routes": [
+    {
+      "source": ".*",
+      "service": "app-front"
+    }
+  ]
+}

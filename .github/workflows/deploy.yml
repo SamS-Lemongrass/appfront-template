@@ -1,0 +1,85 @@
+name: Deploy to Application Frontend
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: ${{ vars.NODE_VERSION || '22' }}
+  APP_BUILD_PATH: ${{ vars.APP_BUILD_PATH || 'webapp' }}
+  APP_NAME: ${{ vars.APP_NAME || github.event.repository.name }}
+  APP_VERSION: ${{ vars.APP_VERSION || 'v1' }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+        if: hashFiles('package-lock.json') != ''
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+        if: hashFiles('package-lock.json') == ''
+
+      - name: Install dependencies
+        run: npm ci
+        if: hashFiles('package.json') != ''
+
+      - name: Build
+        run: ${{ vars.BUILD_COMMAND }}
+        if: vars.BUILD_COMMAND != ''
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-build
+          path: ${{ env.APP_BUILD_PATH }}
+          retention-days: 1
+
+  deploy:
+    name: Deploy to AppFront
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-build
+          path: deploy
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install afctl CLI
+        run: npm install -g @sap/appfront-cli
+
+      - name: Write service key
+        run: echo '${{ secrets.APPFRONT_SERVICE_KEY }}' > /tmp/sk.json
+
+      - name: Login to Application Frontend
+        run: afctl login --service-key /tmp/sk.json -a ${{ vars.APPFRONT_API_URL }}
+
+      - name: Ensure manifest.json exists
+        run: |
+          if [ ! -f deploy/manifest.json ]; then
+            afctl init deploy --app-id "${{ env.APP_NAME }}" --version "${{ env.APP_VERSION }}" --skip-xs-app
+          fi
+
+      - name: Deploy
+        run: afctl push deploy --activate
+
+      - name: Cleanup
+        run: rm -f /tmp/sk.json
+        if: always()
