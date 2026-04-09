@@ -64,6 +64,9 @@ The included GitHub Actions pipeline (`.github/workflows/deploy.yml`) deploys to
 ### Create the service instance and key (if you don't have one)
 
 ```bash
+# Login to Cloud Foundry
+cf login -a https://api.cf.eu10-005.hana.ondemand.com --sso
+
 # Create the instance
 cf create-service app-front developer my-appfront
 
@@ -81,7 +84,7 @@ Go to your repo **Settings > Secrets and variables > Actions**:
 | Type | Name | Value |
 |------|------|-------|
 | **Secret** | `APPFRONT_SERVICE_KEY` | Full JSON from `cf service-key` output |
-| **Variable** | `APPFRONT_API_URL` | `https://api.eu10.dt.appfront.cloud.sap` (adjust region) |
+| **Variable** | `APPFRONT_API_URL` | `https://api.eu10.dt.appfront.cloud.sap` |
 
 **Optional variables:**
 
@@ -128,13 +131,12 @@ No extra config needed. Put files in `webapp/`, push to `main`.
    - `BUILD_COMMAND` = `npm run build`
    - `APP_BUILD_PATH` = `out`
 
-## API Endpoints by Region
+## Endpoints
 
-| Region | API URL |
-|--------|---------|
-| EU10 | `https://api.eu10.dt.appfront.cloud.sap` |
-| US10 | `https://api.us10.dt.appfront.cloud.sap` |
-| AP10 | `https://api.ap10.dt.appfront.cloud.sap` |
+| Service | URL |
+|---------|-----|
+| Cloud Foundry API | `https://api.cf.eu10-005.hana.ondemand.com` |
+| AppFront API (EU10) | `https://api.eu10.dt.appfront.cloud.sap` |
 
 ## Links
 

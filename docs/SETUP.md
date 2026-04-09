@@ -14,7 +14,7 @@ Step-by-step guide to deploying your first app to SAP Application Frontend.
 Log in to Cloud Foundry and create an Application Frontend service instance:
 
 ```bash
-cf login -a https://api.cf.eu10.hana.ondemand.com --sso
+cf login -a https://api.cf.eu10-005.hana.ondemand.com --sso
 cf create-service app-front developer my-appfront-instance
 ```
 
