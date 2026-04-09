@@ -58,23 +58,18 @@ The included GitHub Actions pipeline (`.github/workflows/deploy.yml`) deploys to
 ### Prerequisites
 
 1. **SAP BTP subaccount** with Application Frontend service subscribed
-2. **Service instance** of type `app-front` (plan: `developer`)
-3. **Service key** for the instance
+2. **Service key** for your existing `app-front` service instance
 
-### Create the service instance and key (if you don't have one)
+### Get your service key
 
 ```bash
-# Login to Cloud Foundry
 cf login -a https://api.cf.eu10-005.hana.ondemand.com --sso
 
-# Create the instance
-cf create-service app-front developer my-appfront
-
-# Create a service key
-cf create-service-key my-appfront my-appfront-key
+# List service keys for your app-front instance
+cf service-keys <your-appfront-instance>
 
 # View the key (copy the JSON output)
-cf service-key my-appfront my-appfront-key
+cf service-key <your-appfront-instance> <key-name>
 ```
 
 ### Configure GitHub Secrets & Variables
